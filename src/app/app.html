@@ -1,13 +1,17 @@
-@if(device != undefined){
+<div class="main-div">
+  <h1>WATER-FLOW METER</h1>
+<div>
+
+@if(device$ | async; as device){
   <div>
-      <p> Device Name: {{device.name}}</p>
-      <p> Total Volume: {{device.total_consumption}}</p>
-      <mat-slide-toggle [(ngModel)]="device.valve_status" (change)="onValveToggle()">
-          Valve Status: {{device.valve_status ? 'Open' : 'Close'}}
+      <h2>{{device.name}}</h2>
+      <h3>METER READING: {{device.total_consumption}}</h3>
+      <mat-slide-toggle [(ngModel)]="this.valveStatus" (change)="onValveToggle()">
+          <h3>VALVE is {{device.valve_status ? 'OPEN' : 'CLOSE'}} </h3>
       </mat-slide-toggle>
   </div>
 }
-<div>Message Count: {{messageCount}}</div>
+
 <router-outlet />
 
 <router-outlet />
