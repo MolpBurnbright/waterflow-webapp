@@ -1,23 +1,12 @@
-import { Component, ChangeDetectorRef, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, effect, inject, OnInit, Signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Firestore, doc, docData, updateDoc, collection, collectionData } from '@angular/fire/firestore';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatSlideToggleModule } from "@angular/material/slide-toggle"
-import { MatTableDataSource, MatTableModule} from '@angular/material/table';
-import { Observable, map } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
-
-export interface Device{
-  name: string;
-  total_consumption: number;
-  valve_status: boolean;
-}
-
-export interface WaterLeakLog{
-  time_stamp: string;
-  start_flow_time: string;
-  end_flow_time: string;
-}
+import { MatTableModule} from '@angular/material/table';
+import { Observable } from 'rxjs';
+import { AppService } from './service.app';
+import { Device, WaterLeakLog } from './model.app';
 
 @Component({
   selector: 'app-root',
@@ -26,44 +15,40 @@ export interface WaterLeakLog{
     FormsModule,
     MatSlideToggleModule,
     MatTableModule,
-    AsyncPipe
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
+
 export class App implements OnInit{
+
   protected readonly title = signal('waterflow-webapp');
+  appService: AppService = inject(AppService);
 
-  deviceName: string = 'test_device_1'
+  deviceName: string = "test_device_1";
 
-  firestore: Firestore = inject(Firestore);
-
-  device$: Observable<Device>;
-
-  datasource = new MatTableDataSource<WaterLeakLog>();
-  waterLeakLogs$: Observable<MatTableDataSource<WaterLeakLog>>;
+  device: Signal<Device | undefined>;
+  waterLeakSignal: Signal<WaterLeakLog[] | undefined>;
 
   valveStatus: boolean = false;
-  messageCount: number = 0;
+  
+  waterLeakLogs: WaterLeakLog[] = [];
+  columnsToDisplay = ['time_stamp', 'start_flow_time', 'end_flow_time'];
   
   constructor(){
 
-    const docRef = doc(this.firestore, 'devices', this.deviceName);
-    this.device$ = docData(docRef) as Observable<Device>;
-    
-    const collectionRef = collection(this.firestore, 'devices/' + this.deviceName + '/water_leak_log');
-    this.waterLeakLogs$ = collectionData(collectionRef).pipe(map(data => {
-      const datasource = this.datasource;
-      datasource.data = data as WaterLeakLog[];
-      console.log(datasource.data);
-      return datasource as MatTableDataSource<WaterLeakLog>;
-    }));
-    
-    this.device$.subscribe(data => {
-      this.valveStatus = data.valve_status;
+    this.device = toSignal(this.appService.getDevice(this.deviceName));
+    effect(() => {
+      this.valveStatus = this.device()?.valve_status ?? false;
     });
 
+    this.waterLeakSignal = toSignal(this.appService.getWaterLeakLogs(this.deviceName) as Observable<WaterLeakLog[]>);
+    effect(() => {
 
+      this.waterLeakLogs = this.waterLeakSignal() ?? [];
+
+    });
+    
   }
 
 
@@ -75,8 +60,7 @@ export class App implements OnInit{
 
   onValveToggle(){
 
-    const docRef = doc(this.firestore, 'devices', 'test_device_1');
-    updateDoc(docRef, {"valve_status": this.valveStatus});
+    this.appService.updateDevice(this.valveStatus);
 
   }
  
