@@ -3,7 +3,7 @@
 <div>
 <div>
   <h3>Device ID: {{device()?.name}}</h3>
-  <h3>Meter Reading: {{device()?.total_consumption}}</h3>
+  <h3>Meter Reading: {{device()?.total_consumption}} cu.m.</h3>
   <mat-slide-toggle [(ngModel)]="this.valveStatus" (change)="onValveToggle()">
       <h3>Valve is {{device()?.valve_status ? 'OPEN' : 'CLOSED'}} </h3>
   </mat-slide-toggle>

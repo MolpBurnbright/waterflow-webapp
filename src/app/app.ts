@@ -1,4 +1,4 @@
-import { Component, signal, effect, inject, OnInit, Signal } from '@angular/core';
+import { Component, signal, effect, inject, OnInit, Signal, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
@@ -35,7 +35,10 @@ export class App implements OnInit{
   waterLeakLogs: WaterLeakLog[] = [];
   columnsToDisplay = ['time_stamp', 'start_flow_time', 'end_flow_time'];
   
-  constructor(){
+  updateCounter: number = 0;
+  currLogCount: number = 0;
+
+  constructor(private cdref: ChangeDetectorRef){
 
     this.device = toSignal(this.appService.getDevice(this.deviceName));
     effect(() => {
@@ -45,8 +48,18 @@ export class App implements OnInit{
     this.waterLeakSignal = toSignal(this.appService.getWaterLeakLogs(this.deviceName) as Observable<WaterLeakLog[]>);
     effect(() => {
 
-      this.waterLeakLogs = this.waterLeakSignal() ?? [];
+        this.waterLeakLogs = (this.waterLeakSignal() ?? []).sort((a, b) => (a.time_stamp < b.time_stamp ? 1 : -1));
+        this.cdref.detectChanges();
 
+        this.updateCounter++;
+
+        if(this.updateCounter > 2){
+          if(this.waterLeakLogs.length > this.currLogCount){
+            alert("Water Leak Detected!\nValve has been CLOSED to prevent futher water loss.");
+          }
+        }
+        
+        this.currLogCount = this.waterLeakLogs.length;
     });
     
   }
