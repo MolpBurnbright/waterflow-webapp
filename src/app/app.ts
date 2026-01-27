@@ -33,7 +33,7 @@ export class App implements OnInit{
   valveStatus: boolean = false;
   
   waterLeakLogs: WaterLeakLog[] = [];
-  columnsToDisplay = ['time_stamp', 'start_flow_time', 'end_flow_time'];
+  columnsToDisplay = ['time_stamp', 'start_flow_time', 'duration'];
   
   updateCounter: number = 0;
   currLogCount: number = 0;

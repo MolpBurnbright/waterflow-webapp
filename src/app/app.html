@@ -13,16 +13,16 @@
   <h3>Water Leak Incidents:</h3>
   <table mat-table [dataSource]="waterLeakLogs" class="mat-elevation-z8">
     <ng-container matColumnDef="time_stamp">
-      <th mat-header-cell *matHeaderCellDef> Event Timestamp </th>
+      <th mat-header-cell *matHeaderCellDef> Time Event Recorded </th>
       <td mat-cell *matCellDef="let leakLog"> {{leakLog.time_stamp}} </td>
     </ng-container>
     <ng-container matColumnDef="start_flow_time">
-      <th mat-header-cell *matHeaderCellDef> Start Time </th>
+      <th mat-header-cell *matHeaderCellDef> Time Leak Started</th>
       <td mat-cell *matCellDef="let leakLog"> {{leakLog.start_flow_time}} </td>
     </ng-container>
-    <ng-container matColumnDef="end_flow_time">
-      <th mat-header-cell *matHeaderCellDef> End Time </th>
-      <td mat-cell *matCellDef="let leakLog"> {{leakLog.end_flow_time}} </td>
+    <ng-container matColumnDef="duration">
+      <th mat-header-cell *matHeaderCellDef> Leak Duration (seconds) </th>
+      <td mat-cell *matCellDef="let leakLog"> {{leakLog.duration}} </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
     <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>

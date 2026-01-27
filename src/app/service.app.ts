@@ -17,9 +17,11 @@ export class AppService {
     const collectionRef = collection(this.firestore, 'devices/' + deviceName + '/water_leak_log');
     return collectionData(collectionRef).pipe(map((docs) => {
       docs.forEach((doc: any) => {
+        
         doc.time_stamp = this.convertToLocalDate(new Date(doc.time_stamp));
         doc.start_flow_time = this.convertToLocalDate(new Date(doc.start_flow_time));
         doc.end_flow_time = this.convertToLocalDate(new Date(doc.end_flow_time));
+        doc.duration = Math.floor((new Date(doc.end_flow_time).getTime() - new Date(doc.start_flow_time).getTime()) / 1000);
       });
       return docs;
     }));

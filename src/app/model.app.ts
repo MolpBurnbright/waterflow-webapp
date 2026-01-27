@@ -9,4 +9,5 @@ export interface WaterLeakLog{
   time_stamp: string;
   start_flow_time: string;
   end_flow_time: string;
+  duration: number;
 }
